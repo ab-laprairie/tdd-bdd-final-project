@@ -103,16 +103,15 @@ def create_products():
 #
 # PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
 #
+
 @app.route("/products", methods=["GET"])
 def list_products():
     """Returns a list of Products"""
     app.logger.info("Request to list Products...")
-
     products = []
     name = request.args.get("name")
     category = request.args.get("category")
     available = request.args.get("available")
-
     if name:
         app.logger.info("Find by name: %s", name)
         products = Product.find_by_name(name)
@@ -129,7 +128,6 @@ def list_products():
     else:
         app.logger.info("Find all")
         products = Product.all()
-
     results = [product.serialize() for product in products]
     app.logger.info("[%s] Products returned", len(results))
     return results, status.HTTP_200_OK
@@ -147,14 +145,24 @@ def list_products():
 def get_products(product_id):
     """
     Retrieve a single Product
-    This endpoint will return a Product based on it's id
+    This endpoint will return a Product based on its ID.
     """
-    app.logger.info("Request to Retrieve a product with id [%s]", product_id)
+    app.logger.info(f"Request to Retrieve product with ID: {product_id}")
+
+    # Find the product in the database
     product = Product.find(product_id)
+    
+    # If the product is not found, return a 404 error
     if not product:
-        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
-    app.logger.info("Returning product: %s", product.name)
-    return product.serialize(), status.HTTP_200_OK
+        app.logger.error(f"Product with ID {product_id} not found!")
+        abort(status.HTTP_404_NOT_FOUND, f"Product with ID '{product_id}' was not found.")
+
+    # Serialize product to JSON
+    result = product.serialize()
+    app.logger.info(f"Returning product: {result}")
+
+    # Return the serialized product with HTTP_200_OK status
+    return jsonify(result), status.HTTP_200_OK
 
 ######################################################################
 # U P D A T E   A   P R O D U C T

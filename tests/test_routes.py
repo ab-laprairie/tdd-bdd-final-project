@@ -140,7 +140,7 @@ class TestProductRoutes(TestCase):
         # Uncomment this code once READ is implemented
         #
 
-        # Check that the location header was correct
+        # # Check that the location header was correct
         # response = self.client.get(location)
         # self.assertEqual(response.status_code, status.HTTP_200_OK)
         # new_product = response.get_json()
@@ -172,14 +172,36 @@ class TestProductRoutes(TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+
     def test_get_product(self):
         """It should Get a single Product"""
-        # get the id of a product
+            
+    # Create a product and retrieve the first one
         test_product = self._create_products(1)[0]
+
+    # Make a GET request to fetch the created product
         response = self.client.get(f"{BASE_URL}/{test_product.id}")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    # Verify that the response status code is 200 OK
+        self.assertEqual(
+            response.status_code, 
+            status.HTTP_200_OK, 
+            f"Unexpected status code: {response.status_code}. Response data: {response.data.decode()}"
+        )
+
+    # Extract JSON response safely
         data = response.get_json()
+
+    # Ensure the response contains valid JSON
+        self.assertIsNotNone(data, "Error: API did not return JSON. Response data: " + response.data.decode())
+        self.assertIsInstance(data, dict, "Error: Expected JSON response, but got something else.")
+
+    # Validate that the returned product matches the created product
         self.assertEqual(data["name"], test_product.name)
+        self.assertEqual(data["description"], test_product.description)
+        self.assertEqual(Decimal(data["price"]), test_product.price)
+        self.assertEqual(data["available"], test_product.available)
+        self.assertEqual(data["category"], test_product.category.name)
 
     def test_get_product_not_found(self):
         """It should not Get a Product thats not found"""

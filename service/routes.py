@@ -20,14 +20,15 @@ Product Store Service with UI
 """
 from flask import jsonify, request, abort
 from flask import url_for  # noqa: F401 pylint: disable=unused-import
-from service.models import Product
+from service.models import Product, Category
 from service.common import status  # HTTP Status Codes
 from . import app
-from service.models import Product, Category
 
 ######################################################################
 # H E A L T H   C H E C K
 ######################################################################
+
+
 @app.route("/health")
 def healthcheck():
     """Let them know our heart is still beating"""
@@ -89,7 +90,8 @@ def create_products():
     #
     # Uncomment this line of code once you implement READ A PRODUCT
     #
-    # location_url = url_for("get_products", product_id=product.id, _external=True)
+
+    location_url = url_for("get_products", product_id=product.id, _external=True)
     location_url = "/"  # delete once READ is implemented
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
@@ -127,8 +129,7 @@ def list_products():
     else:
         app.logger.info("Find all")
         products = Product.all()
-        
-    results = [product.serialize() for product in products]
+        results = [product.serialize() for product in products]
     app.logger.info("[%s] Products returned", len(results))
     return results, status.HTTP_200_OK
 
@@ -139,6 +140,8 @@ def list_products():
 #
 # PLACE YOUR CODE HERE TO READ A PRODUCT
 #
+
+
 @app.route("/products/<int:product_id>", methods=["GET"])
 def get_products(product_id):
     """
@@ -159,6 +162,8 @@ def get_products(product_id):
 #
 # PLACE YOUR CODE TO UPDATE A PRODUCT HERE
 #
+
+
 @app.route("/products/<int:product_id>", methods=["PUT"])
 def update_products(product_id):
     """
